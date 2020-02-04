@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 2
 #include <limits.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 char *get_program_name(size_t n, char buf[static n])
@@ -13,13 +14,16 @@ char *get_program_name(size_t n, char buf[static n])
 		return NULL;
 	}
 
-	if (fscanf(pip, "%s", buf) != 1) {
-		pclose(pip);
-		return NULL;
+	char *ret = fgets(pip, buf, n);
+	if (ret) {
+		char *nl = strchr(ret, '\n');
+		if (nl) {
+			*nl = '\0';
+		}
 	}
 
 	pclose(pip);
-	return buf;
+	return ret;
 }
 
 char *getprogname(void)
